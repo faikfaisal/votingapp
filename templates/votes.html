@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Votes</title>
+</head>
+<body>
+    <h1>Current Votes</h1>
+    <table>
+        <tr><th>Restaurant</th><th>Votes</th></tr>
+        {% for vote in votes %}
+        <tr><td>{{ vote.name }}</td><td>{{ vote.value }}</td></tr>
+        {% endfor %}
+    </table>
+    <h2>Vote for your favorite restaurant</h2>
+    <form action="/vote" method="post">
+        {% for vote in votes %}
+        <input type="radio" name="restaurant" value="{{ vote.name }}">{{ vote.name }}<br>
+        {% endfor %}
+        <input type="submit" value="Vote">
+    </form>
+</body>
+</html>

@@ -74,6 +74,8 @@ This app has been created to test deployments to AWS App Runner. However, this i
 - A simple UI to vote and query the votes is in the works
 - the Flask server doesn't have debug enabled. To do so add the following variable: `FLASK_ENV-development` (please note this variable is [incompatible with OpenTelemetry](https://github.com/open-telemetry/opentelemetry-python-contrib/issues/546) so the X-Ray integration won't work until this will get fixed)
 
+The application now includes a password-protected "/votes" page that displays the current voting results in a table and allows users to submit their votes. The page requires authentication with the username "admin" and password "secret". Comprehensive tests have been added to verify the functionality of the new voting page.
+
 
 #### Licensing
 

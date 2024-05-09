@@ -2,6 +2,8 @@ import os
 
 from flask import Flask
 from flask_cors import CORS, cross_origin
+from flask import request, render_template, redirect, Response
+from functools import wraps
 from random import randrange
 import simplejson as json
 import boto3
@@ -110,6 +112,39 @@ def getheavyvotes():
     pool = Pool(processes)
     pool.map(f, range(processes))
     return string_votes
+
+def requires_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth = request.authorization
+        if not auth or not check_auth(auth.username, auth.password):
+            return authenticate()
+        return f(*args, **kwargs)
+    return decorated
+
+def check_auth(username, password):
+    return username == 'admin' and password == 'secret'
+
+def authenticate():
+    return Response('Could not verify your access level for that URL.\n'
+                    'You have to login with proper credentials', 401,
+                    {'WWW-Authenticate': 'Basic realm="Login Required"'})
+
+@app.route('/votes')
+@requires_auth
+def votes():
+    votes = json.loads(getvotes())
+    return render_template('votes.html', votes=votes)
+
+@app.route('/vote', methods=['POST'])
+@requires_auth
+def vote():
+    restaurant = request.form['restaurant']
+    string_votes = readvote(restaurant)
+    votes = int(string_votes)
+    votes += 1
+    updatevote(restaurant, votes)
+    return redirect('/votes')
 
 if __name__ == '__main__':
    app.run(host=os.getenv('IP', '0.0.0.0'), port=int(os.getenv('PORT', 8080)))
